@@ -15,6 +15,9 @@ changelog:
     - title: Documentation 📖
       labels:
         - docs
+    - title: Dependencies 🤖
+      labels:
+        - dependencies
     - title: Other Changes
       labels:
         - "*"

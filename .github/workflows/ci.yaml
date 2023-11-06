@@ -33,6 +33,8 @@ jobs:
           cache: false
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
+        with:
+          args: --out-format "github-actions,colored-line-number"
   goreleaser:
     name: goreleaser
     runs-on: ubuntu-latest

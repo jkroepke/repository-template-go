@@ -21,7 +21,7 @@ jobs:
       - run: go build
       - run: go test ./... -race -covermode=atomic -coverprofile=coverage.out
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
   lint:
     name: lint
     runs-on: ubuntu-latest

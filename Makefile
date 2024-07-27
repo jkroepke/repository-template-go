@@ -7,9 +7,6 @@ WHITE  := \033[0;37m
 CYAN   := \033[0;36m
 RESET  := \033[0m
 
-# renovate: github=golangci/golangci-lint
-GO_LINT_CI_VERSION := v1.59.1
-
 # Get the current working directory
 CURRENT_DIR := $(CURDIR)
 
@@ -52,6 +49,9 @@ check: test lint golangci ## Run all checks locally
 update:  ## Run dependency updates
 	@go get -u ./...
 	@go mod tidy
+	@cd tools
+	@go get -u
+	@go mod tidy
 
 .PHONY: build  ## Build the project
 build: clean $(PROJECT_NAME)
@@ -67,16 +67,17 @@ test:  ## Test the project
 lint: golangci  ## Run linter
 
 .PHONY: fmt  ## Format code
-fmt:
+fmt: install-tools
 	@go fmt ./...
-	@-go run github.com/daixiang0/gci@latest write .
-	@-go run mvdan.cc/gofumpt@latest -l -w .
-	@-go run golang.org/x/tools/cmd/goimports@latest -l -w .
-	@-go run github.com/bombsimon/wsl/v4/cmd...@latest -strict-append -test=true -fix ./...
-	@-go run github.com/catenacyber/perfsprint@latest -fix ./...
-	@-go run github.com/tetafro/godot/cmd/godot@latest -w .
+	@.tools/gci write .
+	@.tools/gofumpt -l -w .
+	@.tools/golangci-lint -l -w .
+	@.tools/goimports -l -w .
+	@.tools/wsl -strict-append -test=true -fix ./...
+	@.tools/perfsprint -fix ./...
+	@.tools/godot -w .
 	# @-go run go run github.com/ssgreg/nlreturn/v2/cmd/nlreturn@latest -fix ./...
-	@go run github.com/golangci/golangci-lint/cmd/golangci-lint@${GO_LINT_CI_VERSION} run ./... --fix
+	@.tools/golangci-lint run ./... --fix
 
 .PHONY: golangci
 golangci:
@@ -85,3 +86,23 @@ golangci:
 .PHONY: 3rdpartylicenses
 3rdpartylicenses:
 	@go run github.com/google/go-licenses@latest save . --save_path=3rdpartylicenses
+
+# In order to help reduce toil related to managing tooling for the open telemetry collector
+# this section of the makefile looks at only requiring command definitions to be defined
+# as part of $(TOOLS_MOD_DIR)/tools.go, following the existing practice.
+# Modifying the tools' `go.mod` file will trigger a rebuild of the tools to help
+# ensure that all contributors are using the most recent version to make builds repeatable everywhere.
+TOOLS_MOD_DIR    := tools
+TOOLS_MOD_REGEX  := "\s+_\s+\".*\""
+TOOLS_PKG_NAMES  := $(shell grep -E $(TOOLS_MOD_REGEX) < $(TOOLS_MOD_DIR)/tools.go | tr -d " _\"")
+TOOLS_BIN_DIR    := .tools
+TOOLS_BIN_NAMES  := $(addprefix $(TOOLS_BIN_DIR)/, $(notdir $(TOOLS_PKG_NAMES)))
+
+.PHONY: install-tools
+install-tools: $(TOOLS_BIN_NAMES)
+
+$(TOOLS_BIN_DIR):
+	mkdir -p $@
+
+$(TOOLS_BIN_NAMES): $(TOOLS_BIN_DIR) $(TOOLS_MOD_DIR)/go.mod
+	go build -C $(TOOLS_MOD_DIR) -o $@ -trimpath $(filter %/$(notdir $@),$(TOOLS_PKG_NAMES))

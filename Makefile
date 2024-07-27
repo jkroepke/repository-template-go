@@ -1,22 +1,39 @@
 ##
 # Console Colors
 ##
-GREEN  := $(shell tput -Txterm setaf 2)
-YELLOW := $(shell tput -Txterm setaf 3)
-WHITE  := $(shell tput -Txterm setaf 7)
-CYAN   := $(shell tput -Txterm setaf 6)
-RESET  := $(shell tput -Txterm sgr0)
+GREEN  := \033[0;32m
+YELLOW := \033[0;33m
+WHITE  := \033[0;37m
+CYAN   := \033[0;36m
+RESET  := \033[0m
 
 # renovate: github=golangci/golangci-lint
 GO_LINT_CI_VERSION := v1.59.1
+
+# Get the current working directory
+CURRENT_DIR := $(CURDIR)
+
+# Get the directory name of the current working directory
+PROJECT_NAME := $(notdir $(CURRENT_DIR))
+
+# Get the GOOS value
+GOOS := $(shell go env GOOS)
+
+# Determine the output file extension based on the GOOS value
+ifeq ($(GOOS),windows)
+    EXT := .exe
+else
+    EXT :=
+endif
 
 ##
 # Targets
 ##
 .PHONY: help
 help: ## show this help.
+	@echo "Project: $(PROJECT_NAME)"
 	@echo 'Usage:'
-	@echo '  ${GREEN}make${RESET} ${YELLOW}<target>${RESET}'
+	@echo "  ${GREEN}make${RESET} ${YELLOW}<target>${RESET}"
 	@echo ''
 	@echo 'Targets:'
 	@awk 'BEGIN {FS = ":.*?## "} { \
@@ -26,75 +43,44 @@ help: ## show this help.
 
 .PHONY: clean
 clean: ## clean builds dir
-	@rm -rf openvpn-auth-oauth2 openvpn-auth-oauth2.exe dist/
+	@rm -rf "$(PROJECT_NAME)" "$(PROJECT_NAME).exe" dist/
 
 .PHONY: check
 check: test lint golangci ## Run all checks locally
 
 .PHONY: update
-update: ## Run dependency updates
+update:  ## Run dependency updates
 	@go get -u ./...
 	@go mod tidy
 
-.PHONY: build
-ifeq ($(OS),Windows_NT)
-build: clean openvpn-auth-oauth2.exe  ## Build openvpn-auth-oauth2
-else
-build: clean openvpn-auth-oauth2
-endif
+.PHONY: build  ## Build the project
+build: clean $(PROJECT_NAME)
 
-
-openvpn-auth-oauth2:
-	@go build -o openvpn-auth-oauth2 .
-
-openvpn-auth-oauth2.exe:
-	@go build -o openvpn-auth-oauth2.exe .
-
-.Phony: build-debug
-build-debug: ## Build openvpn-auth-oauth2 with debug flags
-	@go build -gcflags="-l=4 -m=2" -o openvpn-auth-oauth2 .
+$(PROJECT_NAME):
+	@go build -o $(PROJECT_NAME)$(EXT) .
 
 .PHONY: test
-test:  ## Test openvpn-auth-oauth2
+test:  ## Test the project
 	@go test -race ./...
 
 .PHONY: lint
 lint: golangci  ## Run linter
 
-.PHONY: format
-format: fmt goimports gogci gofumpt gowsl goperfsprint golangci-fix ## Format source code
-
-.PHONY: fmt
+.PHONY: fmt  ## Format code
 fmt:
 	@go fmt ./...
-
-.PHONY: gogci
-gogci:
 	@-go run github.com/daixiang0/gci@latest write .
-
-.PHONY: gofumpt
-gofumpt:
 	@-go run mvdan.cc/gofumpt@latest -l -w .
-
-.PHONY: goimports
-goimports:
 	@-go run golang.org/x/tools/cmd/goimports@latest -l -w .
-
-.PHONY: gowsl
-gowsl:
 	@-go run github.com/bombsimon/wsl/v4/cmd...@latest -strict-append -test=true -fix ./...
-
-.PHONY: goperfsprint
-goperfsprint:
 	@-go run github.com/catenacyber/perfsprint@latest -fix ./...
+	@-go run github.com/tetafro/godot/cmd/godot@latest -w .
+	# @-go run go run github.com/ssgreg/nlreturn/v2/cmd/nlreturn@latest -fix ./...
+	@go run github.com/golangci/golangci-lint/cmd/golangci-lint@${GO_LINT_CI_VERSION} run ./... --fix
 
 .PHONY: golangci
 golangci:
 	@go run github.com/golangci/golangci-lint/cmd/golangci-lint@${GO_LINT_CI_VERSION} run ./...
-
-.PHONY: golangci-fix
-golangci-fix:
-	@go run github.com/golangci/golangci-lint/cmd/golangci-lint@${GO_LINT_CI_VERSION} run ./... --fix
 
 .PHONY: 3rdpartylicenses
 3rdpartylicenses:

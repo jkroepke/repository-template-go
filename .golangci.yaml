@@ -5,6 +5,8 @@ linters:
     - exhaustruct
     - gomnd
     - funlen
+    - execinquery
+    - mnd
 
 issues:
   exclude-rules:
@@ -20,11 +22,13 @@ issues:
         - dupword
         - dupl
         - funlen
+        - gocyclo
 
 linters-settings:
   varnamelen:
     ignore-names:
       - tt
+      - tc
     ignore-decls:
       - i int
       - a ...any
@@ -36,8 +40,5 @@ linters-settings:
       - r *http.Request
       - l net.Listener
       - t reflect.Type
-      - wg sync.WaitGroup
-      - mu sync.Mutex
-      - ch chan<- prometheus.Metric
   lll:
     line-length: 160

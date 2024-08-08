@@ -49,9 +49,8 @@ check: test lint golangci ## Run all checks locally
 update:  ## Run dependency updates
 	@go get -u ./...
 	@go mod tidy
-	@cd tools
-	@go get -u
-	@go mod tidy
+	@go -C tools get -u
+	@go -C tools mod tidy
 
 .PHONY: build  ## Build the project
 build: clean $(PROJECT_NAME)

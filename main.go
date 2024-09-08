@@ -1,6 +1,6 @@
 package main
 
-//nolint:gochecknoglobals
+//nolint:gochecknoglobals,unused
 var (
 	version = "dev"
 	commit  = "none"

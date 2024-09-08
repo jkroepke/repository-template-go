@@ -8,16 +8,22 @@
     "🛠️ dependencies"
   ],
   "dependencyDashboardApproval": true,
-  "postUpdateOptions": [
-    "gomodTidy"
-  ],
   "packageRules": [
     {
       "groupName": "GitHub Actions",
       "matchManagers": [
         "github-actions"
       ]
-    }
+    },
+    {
+      "groupName": "Go tools",
+      "matchPackagePatterns": [
+        "*"
+      ],
+      "matchFileNames": [
+        "tools/**"
+      ],
+    },
   ],
   "postUpdateOptions": [
     "gomodTidy"

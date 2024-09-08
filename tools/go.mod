@@ -9,7 +9,7 @@ require (
 	github.com/golangci/golangci-lint v1.59.1
 	github.com/tetafro/godot v1.4.16
 	golang.org/x/tools v0.23.0
-	mvdan.cc/gofumpt v0.6.0
+	mvdan.cc/gofumpt v0.7.0
 )
 
 require (

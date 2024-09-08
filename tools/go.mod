@@ -8,7 +8,7 @@ require (
 	github.com/daixiang0/gci v0.13.4
 	github.com/golangci/golangci-lint v1.59.1
 	github.com/tetafro/godot v1.4.16
-	golang.org/x/tools v0.23.0
+	golang.org/x/tools v0.24.0
 	mvdan.cc/gofumpt v0.6.0
 )
 
@@ -177,9 +177,9 @@ require (
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/exp v0.0.0-20240103183307-be819d1f06fc // indirect
 	golang.org/x/exp/typeparams v0.0.0-20240314144324-c7f7c6466f7f // indirect
-	golang.org/x/mod v0.19.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.22.0 // indirect
+	golang.org/x/mod v0.20.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
+	golang.org/x/sys v0.23.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

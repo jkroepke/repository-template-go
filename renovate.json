@@ -8,6 +8,9 @@
     "🛠️ dependencies"
   ],
   "dependencyDashboardApproval": true,
+  "postUpdateOptions": [
+    "gomodTidy"
+  ],
   "packageRules": [
     {
       "groupName": "GitHub Actions",

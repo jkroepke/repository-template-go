@@ -22,8 +22,8 @@
       ],
       "matchFileNames": [
         "tools/**"
-      ],
-    },
+      ]
+    }
   ],
   "postUpdateOptions": [
     "gomodTidy"
